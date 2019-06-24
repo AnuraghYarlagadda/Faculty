@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">FacultyApp</string>
     <string name="title_home">Home</string>
+    <string name="inform">Select present to mark for presentees</string>
+    <string name="informagain">Select absent to mark for absenetees</string>
     <string name="title_dashboard">Dashboard</string>
 </resources>

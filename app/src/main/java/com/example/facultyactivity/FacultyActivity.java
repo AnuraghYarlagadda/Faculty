@@ -28,15 +28,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FacultyActivity extends AppCompatActivity {
-    int userexists=0;
+    int userexists = 0;
     private TextView mTextMessage;
     private FacultyCourseAdapter mCourseAdapter;
     private FirebaseAuth mFirebaseAuth;
     private ListView mCourseListView;
     private ChildEventListener mChildEventListener;
     private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mCoursesDatabaseReference,mRollDatabaseReference,mUsersDatabaseReference;
+    private DatabaseReference mCoursesDatabaseReference, mRollDatabaseReference, mUsersDatabaseReference;
 
+    static String encodeUserEmail(String userEmail) {
+        return userEmail.replace(".", ",");
+    }
+
+    static String decodeUserEmail(String userEmail) {
+        return userEmail.replace(",", ".");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,23 +52,20 @@ public class FacultyActivity extends AppCompatActivity {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
         mCoursesDatabaseReference = mFirebaseDatabase.getReference().child("Courses");
-        mRollDatabaseReference=mFirebaseDatabase.getReference().child("Roll");
-        mUsersDatabaseReference=mFirebaseDatabase.getReference().child("Users");
+        mRollDatabaseReference = mFirebaseDatabase.getReference().child("Roll");
+        mUsersDatabaseReference = mFirebaseDatabase.getReference().child("Users");
         final List<Courses> courses = new ArrayList<>();
         mCourseListView = (ListView) findViewById(R.id.list);
         mCourseAdapter = new FacultyCourseAdapter(this, R.layout.facultylist_item, courses);
         mCourseListView.setAdapter(mCourseAdapter);
-        final String ccurrentuser=mFirebaseAuth.getCurrentUser().getEmail();
-        mChildEventListener=new ChildEventListener() {
+        final String ccurrentuser = mFirebaseAuth.getCurrentUser().getEmail();
+        mChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 Courses course = dataSnapshot.getValue(Courses.class);
-                Log.d("chek", course.getCourseName());
-                ArrayList<String> emails=course.getEmails();
-                if(emails.contains(ccurrentuser)) {
+                ArrayList<String> emails = course.getEmails();
+                if (emails.contains(ccurrentuser)) {
                     mCourseAdapter.add(course);
-                    //courses.add(course);
-                    Log.d("cheki", course.getCourseName());
                 }
             }
 
@@ -89,25 +93,18 @@ public class FacultyActivity extends AppCompatActivity {
         mCoursesDatabaseReference.child("All").addChildEventListener(mChildEventListener);
 
     }
-    static String encodeUserEmail(String userEmail) {
-        return userEmail.replace(".", ",");
-    }
 
-    static String decodeUserEmail(String userEmail) {
-        return userEmail.replace(",", ".");
-    }
-    public void showAtt(final Courses thisCourse){
-        Query query= FirebaseDatabase.getInstance().getReference().child("Attendance").child(thisCourse.year).child(thisCourse.courseName);
+    public void showAtt(final Courses thisCourse) {
+        Query query = FirebaseDatabase.getInstance().getReference().child("Attendance").child(thisCourse.year).child(thisCourse.courseName);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    Intent intent=new Intent(FacultyActivity.this,ShowAttActivity.class);
-                    intent.putExtra("CourseName",thisCourse.courseName);
-                    intent.putExtra("Year",thisCourse.year);
+                    Intent intent = new Intent(FacultyActivity.this, ShowAttActivity.class);
+                    intent.putExtra("CourseName", thisCourse.courseName);
+                    intent.putExtra("Year", thisCourse.year);
                     FacultyActivity.this.startActivity(intent);
                 } else {
-                    Log.e("hhh", "N");
                     Toast.makeText(FacultyActivity.this, "Attendance Not Added", Toast.LENGTH_LONG).show();
                 }
             }
@@ -120,20 +117,20 @@ public class FacultyActivity extends AppCompatActivity {
 
 
     }
-    public void permitaddatt(final Courses thisCourse){
-        final String courseName=thisCourse.courseName;
-        Query query= FirebaseDatabase.getInstance().getReference().child("Roll").child(thisCourse.year).child(courseName);
+
+    public void permitaddatt(final Courses thisCourse, final String status) {
+        final String courseName = thisCourse.courseName;
+        Query query = FirebaseDatabase.getInstance().getReference().child("Roll").child(thisCourse.year).child(courseName);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     Intent intent = new Intent(FacultyActivity.this, AddAttActivity.class);
                     intent.putExtra("CourseName", courseName);
-                    intent.putExtra("Year",thisCourse.year);
+                    intent.putExtra("Year", thisCourse.year);
+                    intent.putExtra("Status", status);
                     FacultyActivity.this.startActivity(intent);
-                    Log.e("hhhh", "Y" + "");
                 } else {
-                    Log.e("hhh", "N");
                     Toast.makeText(FacultyActivity.this, "Please Add Excel", Toast.LENGTH_LONG).show();
                 }
             }
@@ -154,7 +151,7 @@ public class FacultyActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent x=new Intent(FacultyActivity.this,MainActivity.class);
+        Intent x = new Intent(FacultyActivity.this, MainActivity.class);
         startActivity(x);
     }
 }

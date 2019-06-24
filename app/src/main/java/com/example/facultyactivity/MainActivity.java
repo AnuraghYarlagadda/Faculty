@@ -84,15 +84,22 @@ import static android.os.SystemClock.sleep;
 
 public class MainActivity extends AppCompatActivity {
     public static final int RC_SIGN_IN = 1;
-    private TextView mTextMessage;
-    public String adminemail ="shinybandi@gmail.com";
+    public String adminemail = "shinybandi@gmail.com";
     ImageButton enter;
+    private TextView mTextMessage;
     private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mCoursesDatabaseReference,mRollDatabaseReference,mUsersDatabaseReference,mAdminDatabaseReference;
+    private DatabaseReference mCoursesDatabaseReference, mRollDatabaseReference, mUsersDatabaseReference, mAdminDatabaseReference;
     private FirebaseAuth mFirebaseAuth;
     private ChildEventListener mChildEventListener;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
+    static String encodeUserEmail(String userEmail) {
+        return userEmail.replace(".", ",");
+    }
+
+    static String decodeUserEmail(String userEmail) {
+        return userEmail.replace(",", ".");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,13 +110,12 @@ public class MainActivity extends AppCompatActivity {
                 != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            }
-            else {
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+            } else {
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
             }
         } else {
         }
-        enter=(ImageButton)findViewById(R.id.button);
+        enter = (ImageButton) findViewById(R.id.button);
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mCoursesDatabaseReference = mFirebaseDatabase.getReference().child("Courses");
         mAdminDatabaseReference = mFirebaseDatabase.getReference().child("Admin");
@@ -118,11 +124,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                if( user != null){
+                if (user != null) {
                     //user is signedin
                     Toast.makeText(MainActivity.this, "You're now signed in.", Toast.LENGTH_SHORT).show();
-                }
-                else{
+                } else {
                     //user is signed out
                     // Choose authentication providers
                     List<AuthUI.IdpConfig> providers = Arrays.asList(
@@ -144,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         mAdminDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                adminemail=dataSnapshot.getValue().toString();
+                adminemail = dataSnapshot.getValue().toString();
             }
 
             @Override
@@ -156,12 +161,11 @@ public class MainActivity extends AppCompatActivity {
         enter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String ccurrentuser=mFirebaseAuth.getCurrentUser().getEmail();
+                String ccurrentuser = mFirebaseAuth.getCurrentUser().getEmail();
                 mAdminDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        adminemail=dataSnapshot.getValue().toString();
-                        Log.d("adminemailv",adminemail);
+                        adminemail = dataSnapshot.getValue().toString();
                     }
 
                     @Override
@@ -170,19 +174,18 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 sleep(3000);
-                Toast.makeText(MainActivity.this,"Loading...",Toast.LENGTH_LONG).show();
-                Log.d("adminemail",adminemail);
-                if(ccurrentuser==(adminemail)){
+                Toast.makeText(MainActivity.this, "Loading...", Toast.LENGTH_LONG).show();
+                if (ccurrentuser == (adminemail)) {
                     //Intent intent=new Intent(MainActivity.this,AdminActivity.class);
                     //MainActivity.this.startActivity(intent);
-                }
-                else{
-                    Intent intent=new Intent(MainActivity.this,FacultyActivity.class);
+                } else {
+                    Intent intent = new Intent(MainActivity.this, FacultyActivity.class);
                     MainActivity.this.startActivity(intent);
                 }
             }
         });
     }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (data == null)
@@ -203,13 +206,14 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.menu, menu);
         return true;
     }
+
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_signout:
@@ -219,6 +223,7 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
     protected void onResume() {
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
@@ -231,13 +236,7 @@ public class MainActivity extends AppCompatActivity {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
     }
-    static String encodeUserEmail(String userEmail) {
-        return userEmail.replace(".", ",");
-    }
 
-    static String decodeUserEmail(String userEmail) {
-        return userEmail.replace(",", ".");
-    }
     public AlertDialog.Builder buildDialog(Context c) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(c);

@@ -11,29 +11,50 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:orientation="vertical"
         android:id="@+id/llcb">
-        <CheckBox
-            android:layout_height="match_parent"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:text="Present"
-            android:id="@+id/presentcb">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_margin="5dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:id="@+id/namecourse"
+                android:textColor="@color/white"
+                android:background="@color/red"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <CheckBox
+                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="Present"
+                android:id="@+id/presentcb">
 
-        </CheckBox>
-        <CheckBox
-            android:layout_height="match_parent"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:text="Absent"
-            android:id="@+id/absentcb">
+            </CheckBox>
+            <CheckBox
+                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="Absent"
+                android:id="@+id/absentcb">
 
-        </CheckBox>
-        <Button
-            android:layout_height="match_parent"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:text="Clear All"
-            android:id="@+id/clearall"/>
+            </CheckBox>
+            <Button
+                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:backgroundTint="@android:color/holo_orange_dark"
+                android:text="Clear All"
+                android:id="@+id/clearall"/>
+        </LinearLayout>
     </LinearLayout>
 
     <ScrollView
@@ -51,6 +72,7 @@
     <Button
         android:id="@+id/submit_button"
         android:layout_width="match_parent"
+        android:backgroundTint="@android:color/holo_green_dark"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:text="Submit"/>
