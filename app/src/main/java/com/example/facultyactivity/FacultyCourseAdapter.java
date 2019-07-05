@@ -39,6 +39,7 @@ public class FacultyCourseAdapter extends ArrayAdapter<Courses> {
         TextView courseTextView = (TextView) convertView.findViewById(R.id.course);
         TextView facultyTextView = (TextView) convertView.findViewById(R.id.faculty);
         TextView emailsTextView = (TextView) convertView.findViewById(R.id.emails);
+        TextView yearTextView=(TextView)convertView.findViewById(R.id.year);
         emailsTextView.setSelected(true);
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mStatusDatabaseReference=mFirebaseDatabase.getReference().child("Status");
@@ -78,6 +79,7 @@ public class FacultyCourseAdapter extends ArrayAdapter<Courses> {
         Courses course=getItem(position);
         courseTextView.setText(course.getCourseName());
         facultyTextView.setText(course.getCourseFaculty());
+        yearTextView.setText("Year :"+course.getYear());
         ArrayList<String> emails=course.getEmails();
         String allemails="";
         if(!emails.isEmpty()) {

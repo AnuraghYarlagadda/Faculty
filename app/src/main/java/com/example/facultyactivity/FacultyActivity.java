@@ -7,9 +7,12 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,14 +31,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FacultyActivity extends AppCompatActivity {
-    int userexists = 0;
-    private TextView mTextMessage;
+    private String status;
     private FacultyCourseAdapter mCourseAdapter;
     private FirebaseAuth mFirebaseAuth;
     private ListView mCourseListView;
     private ChildEventListener mChildEventListener;
     private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mCoursesDatabaseReference, mRollDatabaseReference, mUsersDatabaseReference;
+    private DatabaseReference mCoursesDatabaseReference, mRollDatabaseReference, mUsersDatabaseReference, mStatusDatabaseReference;
 
     static String encodeUserEmail(String userEmail) {
         return userEmail.replace(".", ",");
@@ -54,6 +56,7 @@ public class FacultyActivity extends AppCompatActivity {
         mCoursesDatabaseReference = mFirebaseDatabase.getReference().child("Courses");
         mRollDatabaseReference = mFirebaseDatabase.getReference().child("Roll");
         mUsersDatabaseReference = mFirebaseDatabase.getReference().child("Users");
+        mStatusDatabaseReference = mFirebaseDatabase.getReference().child("Status");
         final List<Courses> courses = new ArrayList<>();
         mCourseListView = (ListView) findViewById(R.id.list);
         mCourseAdapter = new FacultyCourseAdapter(this, R.layout.facultylist_item, courses);
@@ -95,51 +98,64 @@ public class FacultyActivity extends AppCompatActivity {
     }
 
     public void showAtt(final Courses thisCourse) {
-        Query query = FirebaseDatabase.getInstance().getReference().child("Attendance").child(thisCourse.year).child(thisCourse.courseName);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        LayoutInflater li = LayoutInflater.from(FacultyActivity.this);
+        View promptsView = li.inflate(R.layout.buttonprompt, null);
+        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(FacultyActivity.this);
+        alertDialogBuilder.setView(promptsView);
+        final Button present = (Button) promptsView.findViewById(R.id.present);
+        final Button absent = (Button) promptsView.findViewById(R.id.absent);
+        android.app.AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+        present.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    Intent intent = new Intent(FacultyActivity.this, ShowAttActivity.class);
-                    intent.putExtra("CourseName", thisCourse.courseName);
-                    intent.putExtra("Year", thisCourse.year);
-                    FacultyActivity.this.startActivity(intent);
-                } else {
-                    Toast.makeText(FacultyActivity.this, "Attendance Not Added", Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
+            public void onClick(View v) {
+                Intent intent = new Intent(FacultyActivity.this, ShowAttActivity.class);
+                intent.putExtra("CourseName", thisCourse.courseName);
+                intent.putExtra("Year", thisCourse.year);
+                intent.putExtra("what", "present");
+                FacultyActivity.this.startActivity(intent);
             }
         });
-
-
+        absent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(FacultyActivity.this, ShowAttActivity.class);
+                intent.putExtra("CourseName", thisCourse.courseName);
+                intent.putExtra("Year", thisCourse.year);
+                intent.putExtra("what", "absent");
+                FacultyActivity.this.startActivity(intent);
+            }
+        });
     }
 
     public void permitaddatt(final Courses thisCourse, final String status) {
-        final String courseName = thisCourse.courseName;
-        Query query = FirebaseDatabase.getInstance().getReference().child("Roll").child(thisCourse.year).child(courseName);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    Intent intent = new Intent(FacultyActivity.this, AddAttActivity.class);
-                    intent.putExtra("CourseName", courseName);
-                    intent.putExtra("Year", thisCourse.year);
-                    intent.putExtra("Status", status);
-                    FacultyActivity.this.startActivity(intent);
-                } else {
-                    Toast.makeText(FacultyActivity.this, "Please Add Excel", Toast.LENGTH_LONG).show();
+        if (status.equals("True") && status != null) {
+            final String courseName = thisCourse.courseName;
+            final String Year = thisCourse.year;
+            Query query = FirebaseDatabase.getInstance().getReference().child("Roll").child(Year).child(courseName);
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                    if (dataSnapshot.exists()) {
+                        Intent intent = new Intent(FacultyActivity.this, AddAttActivity.class);
+                        intent.putExtra("CourseName", courseName);
+                        intent.putExtra("Year", Year);
+                        intent.putExtra("status", status);
+                        FacultyActivity.this.startActivity(intent);
+                    } else {
+                        Toast.makeText(FacultyActivity.this, "Please Add Excel", Toast.LENGTH_LONG).show();
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+                }
+            });
+        } else {
+            Toast.makeText(FacultyActivity.this, "Permission Not Granted", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override

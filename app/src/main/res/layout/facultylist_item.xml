@@ -26,18 +26,32 @@
                 android:textSize="15sp"
                 android:textStyle="bold"
                 tools:text="Course" />
-
-            <TextView
-                android:id="@+id/faculty"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:textAllCaps="true"
-                android:textSize="15sp"
-                android:textStyle="italic"
-                tools:text="Faculty" />
+                android:layout_weight="1">
+                <TextView
+                    android:id="@+id/faculty"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textAllCaps="true"
+                    android:textSize="15sp"
+                    android:textStyle="italic"
+                    tools:text="Faculty" />
+                <TextView
+                    android:id="@+id/year"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textAllCaps="true"
+                    android:textSize="15sp"
+                    android:textStyle="italic"
+                    tools:text="Year" />
 
+            </LinearLayout>
             <TextView
                 android:id="@+id/emails"
                 android:layout_width="match_parent"
